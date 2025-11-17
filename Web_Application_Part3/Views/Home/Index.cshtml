@@ -1,0 +1,39 @@
+﻿@model Web_Application_Part3.Models.Login
+
+<link rel="stylesheet" href="~/css/log_regi.css" />
+
+<div class="container">
+    <div class="left-section">
+        <h2>CMCS</h2>
+    </div>
+    <div class="right-section">
+        <h1>Login</h1>
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+        <form asp-action="Index" method="post" enctype="multipart/form-data">
+
+            <label type="text" asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" type="email" placeholder="Enter your email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" type="password" placeholder="Enter your password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+
+            <label asp-for="Role" class="form-label">Select Role</label>
+            <select asp-for="Role">
+                <option value="">-- Select Role --</option>
+                <option value="Admin" action="/Home/Dashboard_Admin">Admin</option>
+                <option value="HR" action="/Home/Dashboard_HR">HR</option>
+                <option value="Lecturer" action="/Home/Dashboard_L">Lecturer</option>
+                
+            </select>
+            <span asp-validation-for="Role" class="text-danger"></span>
+
+            <button type="submit">Login</button>
+            <p>Don’t have an account?    <a asp-controller="Home" asp-action="Register">Register now</a></p>
+        </form>
+    </div>
+</div>

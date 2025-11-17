@@ -1,0 +1,142 @@
+﻿﻿@* Views/Home/Dashboard_L.cshtml *@
+
+<link rel="stylesheet" href="~/css/nav.css" />
+<link rel="stylesheet" href="~/css/claim.css" />
+
+<!-- Navigation -->
+<nav>
+    <ul class="nav-menu">
+        <li><a href="@Url.Action("Dashboard_Admin", "Home")">Dashboard</a></li>
+        <li><a href="@Url.Action("claims_A", "Home")">Manage Claims</a></li>
+        <li><a href="@Url.Action("Profile_A", "Home")">Profile</a></li>
+    </ul>
+</nav>
+
+<link rel="stylesheet" href="~/css/dashboard.css" />
+
+<div class="dashboard-container">
+    <h1>Admin Dashboard</h1>
+
+    <!-- Notifications -->
+    <div class="notifications">
+        <h2>Notifications</h2>
+        <ul>
+            @foreach (var notification in Model.Notifications)
+            {
+                <li>
+                    @if (notification.Type == "NewClaim")
+                    {
+                        <span class="new-claim-notification">NEW CLAIM</span>
+                    }
+                    else if (notification.Type == "Approved")
+                    {
+                        <span class="approved-notification">APPROVED</span>
+                    }
+                    else if (notification.Type == "Declined")
+                    {
+                        <span class="declined-notification">DECLINED</span>
+                    }
+                    @notification.Message
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- Pending Claims -->
+    <div class="pending-claims">
+        <h2>Pending Claims</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Faculty Name</th>
+                    <th>Module Name</th>
+                    <th>Created Date</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.PendingClaims)
+                {
+                    <tr>
+                        <td>@claim.claimID</td>
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <form asp-action="UpdateClaimStatus" method="post">
+                                <input type="hidden" name="claimID" value="@claim.claimID" />
+                                <select name="claim_status" onchange="this.form.submit()">
+                                    @if (claim.claim_status == "Pending")
+                                    {
+                                        <option value="Pending">Pending</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Declined">Declined</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@claim.claim_status" selected>@claim.claim_status</option>
+                                    }
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <!-- Approved Claims -->
+    <div class="approved-claims">
+        <h2>Approved Claims</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Faculty Name</th>
+                    <th>Module Name</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.ApprovedClaims)
+                {
+                    <tr>
+                        <td>@claim.claimID</td>
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Declined Claims -->
+    <div class="declined-claims">
+        <h2>Declined Claims</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Faculty Name</th>
+                    <th>Module Name</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.DeclinedClaims)
+                {
+                    <tr>
+                        <td>@claim.claimID</td>
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

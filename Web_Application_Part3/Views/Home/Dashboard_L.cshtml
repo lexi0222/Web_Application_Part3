@@ -1,0 +1,178 @@
+﻿@* Views/Home/Dashboard_L.cshtml *@
+
+<link rel="stylesheet" href="~/css/nav.css" />
+<link rel="stylesheet" href="~/css/claim.css" />
+
+<!-- Navigation -->
+<nav>
+    <ul class="nav-menu">
+        <li><a href="@Url.Action("Dashboard_L", "Home")">Dashboard</a></li>
+        <li><a href="@Url.Action("claims", "Home")"> Claims</a></li>
+        <li><a href="@Url.Action("Profile_L", "Home")">Profile</a></li>
+    </ul>
+</nav>
+
+<link rel="stylesheet" href="~/css/dashboard.css" />
+
+@if (Model != null)
+{
+    <div class="dashboard-container">
+        <h1>Lecturer Dashboard</h1>
+        <!-- Notifications -->
+        @if (Model.Notifications != null)
+        {
+            <div class="notifications">
+                <h2>Notifications</h2>
+                <ul>
+                    @foreach (var notification in Model.Notifications)
+                    {
+                        <li>
+                            @if (notification.Type == "NewClaim")
+                            {
+                                <span class="new-claim-notification">NEW CLAIM</span>
+                            }
+                            else if (notification.Type == "Approved")
+                            {
+                                <span class="approved-notification">APPROVED</span>
+                            }
+                            else if (notification.Type == "Declined")
+                            {
+                                <span class="declined-notification">DECLINED</span>
+                            }
+                            @notification.Message
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <p>No notifications available.</p>
+        }
+        <!-- Recent Claims -->
+        @if (Model.RecentClaims != null)
+        {
+            <div class="recent-claims">
+                <h2>Recent Claims</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>Faculty Name</th>
+                            <th>Module Name</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in Model.RecentClaims)
+                        {
+                            <tr>
+                                <td>@claim.claimID</td>
+                                <td>@claim.FacallyName</td>
+                                <td>@claim.ModuleName</td>
+                                <td>Pending</td>
+                                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p>No recent claims available.</p>
+        }
+        <!-- Approved Claims -->
+        @if (Model.ApprovedClaims != null)
+        {
+            <div class="approved-claims">
+                <h2>Approved Claims</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>Faculty Name</th>
+                            <th>Module Name</th>
+                            <th>Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in Model.ApprovedClaims)
+                        {
+                            <tr>
+                                <td>@claim.claimID</td>
+                                <td>@claim.FacallyName</td>
+                                <td>@claim.ModuleName</td>
+                                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p>No approved claims available.</p>
+        }
+        <!-- Declined Claims -->
+        @if (Model.DeclinedClaims != null)
+        {
+            <div class="declined-claims">
+                <h2>Declined Claims</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>Faculty Name</th>
+                            <th>Module Name</th>
+                            <th>Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in Model.DeclinedClaims)
+                        {
+                            <tr>
+                                <td>@claim.claimID</td>
+                                <td>@claim.FacallyName</td>
+                                <td>@claim.ModuleName</td>
+                                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p>No declined claims available.</p>
+        }
+    </div>
+}
+else
+{
+    <p>No data available.</p>
+}
+<table>
+    <thead>
+        <tr>
+            <th>Claim ID</th>
+            <th>Faculty Name</th>
+            <th>Module Name</th>
+            <th>Status</th>
+            <th>Created Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model.RecentClaims)
+        {
+            <tr>
+                <td>@claim.claimID</td>
+                <td>@claim.FacallyName</td>
+                <td>@claim.ModuleName</td>
+                <td>@claim.claim_status</td>
+                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>

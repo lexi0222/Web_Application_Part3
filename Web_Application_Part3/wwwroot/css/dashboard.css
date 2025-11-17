@@ -1,0 +1,45 @@
+﻿.dashboard-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #333333;
+    border: 1px solid #444444;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    color: #FFFFFF; /* Added white text color */
+}
+
+.approved-notification {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.rejected-notification {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.pending-notification {
+    color: #f1c40f;
+    font-weight: bold;
+}
+
+.recent-updates ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recent-updates li {
+    margin-bottom: 10px;
+}
+
+.update-date {
+    font-size: 12px;
+    color: #FFFFFF; /* Changed to white */
+}
+
+.update-message {
+    font-size: 14px;
+    color: #FFFFFF; /* Changed to white */
+}
