@@ -70,17 +70,7 @@
                         <td>@claim.TotalAmount</td>
                         <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
 
-                        <td>
-                            @if (!string.IsNullOrEmpty(claim.SupportingDocuments))
-                            {
-                                <a href="~/@claim.SupportingDocuments" target="_blank">View</a>
-                            }
-                            else
-                            {
-                                <span>None</span>
-                            }
-                        </td>
-
+                       
                         <td>
                             <form asp-action="UpdateHRStatus" method="post">
                                 <input type="hidden" name="claimID" value="@claim.claimID" />

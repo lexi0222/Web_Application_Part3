@@ -43,26 +43,31 @@ namespace Web_Application_Part3.Controllers
                 cmd.Parameters.AddWithValue("@Role", user.Role);
 
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                if (reader.Read()) // <-- check if a matching user exists
                 {
+                    // Set session
                     HttpContext.Session.SetString("Email", user.Email);
                     HttpContext.Session.SetString("Role", user.Role);
 
-                    if (user.Role == "Admin")
+                    // Redirect based on role from DB
+                    string role = reader["Role"].ToString();
+                    if (role == "Admin")
                         return RedirectToAction("Dashboard_Admin", "Home");
-                    else
+                    else if (role == "Lecturer")
                         return RedirectToAction("Dashboard_L", "Home");
+                    else if (role == "HR")
+                        return RedirectToAction("Dashboard_HR", "Home");
                 }
                 else
                 {
                     ViewBag.Error = "Invalid email, password, or role.";
                 }
+
                 con.Close();
             }
 
             return View(user);
         }
-
 
         public IActionResult Privacy()
         {
@@ -118,7 +123,7 @@ namespace Web_Application_Part3.Controllers
             return View();
         }
 
-        [HttpPost]
+        
         [HttpPost]
         public IActionResult Claims(claims info)
         {
@@ -561,6 +566,179 @@ namespace Web_Application_Part3.Controllers
             return new List<RecentUpdate>();
         }
 
+        [HttpGet]
+        public IActionResult Dashboard_HR()
+        {
+            var email = HttpContext.Session.GetString("Email");
+            var role = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(email) || role != "HR")
+                return RedirectToAction("Index"); // Not logged in or not HR
+
+            // Get HR name from database
+            string hrName = GetUser(email)?.Name ?? email;
+
+            // Prepare HR dashboard model
+            var model = new HRDashboardModel
+            {
+                HRName = hrName,
+                Notifications = GetHRNotifications(email),
+                PendingHRClaims = GetPendingHRClaims(),
+                ApprovedByHR = GetApprovedHRClaims(),
+                DeclinedByHR = GetDeclinedHRClaims()
+            };
+
+            return View(model);
+        }
+
+        private List<Notification> GetHRNotifications(string hrEmail)
+        {
+            var notifications = new List<Notification>();
+
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"
+            SELECT c.claimID, c.FacallyName, c.ModuleName, c.claim_status, c.creating_date, u.Email AS LecturerEmail
+            FROM Claims c
+            JOIN Users u ON c.userID = u.userID
+            WHERE c.claim_status IN ('PendingHR', 'Approved', 'Declined')
+            ORDER BY c.creating_date DESC";
+
+                using (var cmd = new SqlCommand(query, con))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string type = reader["claim_status"].ToString() switch
+                        {
+                            "PendingHR" => "NewClaim",
+                            "Approved" => "AdminApproved",
+                            "Declined" => "Warning",
+                            _ => "Info"
+                        };
+
+                        string message = reader["claim_status"].ToString() switch
+                        {
+                            "PendingHR" => $"New claim from {reader["FacallyName"]} for module {reader["ModuleName"]}",
+                            "Approved" => $"Claim by {reader["FacallyName"]} approved by Admin",
+                            "Declined" => $"Claim by {reader["FacallyName"]} declined by Admin",
+                            _ => "Unknown notification"
+                        };
+
+                        notifications.Add(new Notification
+                        {
+                            Type = type,
+                            Message = message
+                        });
+                    }
+                }
+            }
+
+            return notifications;
+        }
+
+
+        private List<ClaimHR> GetPendingHRClaims()
+        {
+            var list = new List<ClaimHR>();
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"SELECT c.*, u.full_names AS LecturerName
+                         FROM Claims c
+                         JOIN Users u ON c.userID = u.userID
+                         WHERE claim_status = 'PendingHR'";
+                using (var cmd = new SqlCommand(query, con))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new ClaimHR
+                        {
+                            claimID = Convert.ToInt32(reader["claimID"]),
+                            FacallyName = reader["FacallyName"].ToString(),
+                            ModuleName = reader["ModuleName"].ToString(),
+                            Hourworked = Convert.ToInt32(reader["Hourworked"]),
+                            Hourlyrate = Convert.ToInt32(reader["Hourlyrate"]),
+                            TotalAmount = Convert.ToInt32(reader["TotalAmount"]),
+                            claim_status = reader["claim_status"].ToString(),
+                            creating_date = Convert.ToDateTime(reader["creating_date"]),
+                            SupportingDocuments = reader["SupportingDocuments"].ToString()
+                        });
+                    }
+                }
+            }
+            return list; // now List<ClaimHR>
+        }
+
+
+
+        private List<ClaimHR> GetApprovedHRClaims()
+        {
+            var list = new List<ClaimHR>();
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"SELECT c.*, u.full_names AS LecturerName
+                         FROM Claims c
+                         JOIN Users u ON c.userID = u.userID
+                         WHERE claim_status = 'ApprovedByHR'";
+                using (var cmd = new SqlCommand(query, con))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new ClaimHR
+                        {
+                            claimID = Convert.ToInt32(reader["claimID"]),
+                            FacallyName = reader["FacallyName"].ToString(),
+                            ModuleName = reader["ModuleName"].ToString(),
+                            Hourworked = Convert.ToInt32(reader["Hourworked"]),
+                            Hourlyrate = Convert.ToInt32(reader["Hourlyrate"]),
+                            TotalAmount = Convert.ToInt32(reader["TotalAmount"]),
+                            claim_status = reader["claim_status"].ToString(),
+                            creating_date = Convert.ToDateTime(reader["creating_date"]),
+                            SupportingDocuments = reader["SupportingDocuments"].ToString()
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        private List<ClaimHR> GetDeclinedHRClaims()
+        {
+            var list = new List<ClaimHR>();
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"SELECT c.*, u.full_names AS LecturerName
+                         FROM Claims c
+                         JOIN Users u ON c.userID = u.userID
+                         WHERE claim_status = 'DeclinedByHR'";
+                using (var cmd = new SqlCommand(query, con))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new ClaimHR
+                        {
+                            claimID = Convert.ToInt32(reader["claimID"]),
+                            FacallyName = reader["FacallyName"].ToString(),
+                            ModuleName = reader["ModuleName"].ToString(),
+                            Hourworked = Convert.ToInt32(reader["Hourworked"]),
+                            Hourlyrate = Convert.ToInt32(reader["Hourlyrate"]),
+                            TotalAmount = Convert.ToInt32(reader["TotalAmount"]),
+                            claim_status = reader["claim_status"].ToString(),
+                            creating_date = Convert.ToDateTime(reader["creating_date"]),
+                            SupportingDocuments = reader["SupportingDocuments"].ToString()
+                        });
+                    }
+                }
+            }
+            return list;
+        }
 
 
     }
