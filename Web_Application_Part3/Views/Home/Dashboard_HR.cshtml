@@ -1,0 +1,156 @@
+﻿@model Web_Application_Part3.Models.HRDashboardModel
+
+<link rel="stylesheet" href="~/css/nav.css" />
+<link rel="stylesheet" href="~/css/claim.css" />
+
+<!-- Navigation -->
+<nav>
+    <ul class="nav-menu">
+        <li><a href="@Url.Action("Dashboard_HR", "Home")">Dashboard</a></li>
+        <li><a href="@Url.Action("ManageLecturersAndAdmins", "Home")">Manage Lecturers and Admins</a></li>
+        <li><a href="@Url.Action("Profile_HR", "Home")">Profile</a></li>
+    </ul>
+</nav>
+
+<link rel="stylesheet" href="~/css/dashboard.css" />
+
+<div class="dashboard-container">
+
+    <!-- HR Welcome -->
+    <h1>Welcome HR — @Model.HRName</h1>
+
+    <!-- Notifications -->
+    <div class="notifications">
+        <h2>Notifications</h2>
+        <ul>
+            @foreach (var notification in Model.Notifications)
+            {
+                <li>
+                    @if (notification.Type == "NewClaim")
+                    {
+                        <span class="new-claim-notification">NEW CLAIM</span>
+                    }
+                    else if (notification.Type == "AdminApproved")
+                    {
+                        <span class="approved-notification">ADMIN APPROVED</span>
+                    }
+                    else if (notification.Type == "Warning")
+                    {
+                        <span class="declined-notification">WARNING</span>
+                    }
+
+                    @notification.Message
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- Pending HR Claims -->
+    <div class="pending-claims">
+        <h2>Claims Waiting for HR Approval</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Faculty</th>
+                    <th>Module</th>
+                    <th>Total (R)</th>
+                    <th>Submitted</th>
+                    <th>Document</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.PendingHRClaims)
+                {
+                    <tr>
+                        <td>@claim.claimID</td>
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.TotalAmount</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(claim.SupportingDocuments))
+                            {
+                                <a href="~/@claim.SupportingDocuments" target="_blank">View</a>
+                            }
+                            else
+                            {
+                                <span>None</span>
+                            }
+                        </td>
+
+                        <td>
+                            <form asp-action="UpdateHRStatus" method="post">
+                                <input type="hidden" name="claimID" value="@claim.claimID" />
+                                <select name="claim_status" onchange="this.form.submit()">
+                                    <option value="HR Pending">HR Pending</option>
+                                    <option value="HR Approved">HR Approved</option>
+                                    <option value="HR Declined">HR Declined</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- HR Approved Claims -->
+    <div class="approved-claims">
+        <h2>HR Approved Claims</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Faculty</th>
+                    <th>Module</th>
+                    <th>Total (R)</th>
+                    <th>Approved On</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.ApprovedByHR)
+                {
+                    <tr>
+                        <td>@claim.claimID</td>
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.TotalAmount</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- HR Declined Claims -->
+    <div class="declined-claims">
+        <h2>HR Declined Claims</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Faculty</th>
+                    <th>Module</th>
+                    <th>Total (R)</th>
+                    <th>Declined On</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.DeclinedByHR)
+                {
+                    <tr>
+                        <td>@claim.claimID</td>
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.TotalAmount</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
