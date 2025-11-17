@@ -1,0 +1,55 @@
+﻿@model Web_Application_Part3.Models.Login
+
+
+<link rel="stylesheet" href="~/css/profile.css" />
+<link rel="stylesheet" href="~/css/nav.css" />
+
+<!-- Navigation -->
+<nav>
+    <ul class="nav-menu">
+        <li><a href="@Url.Action("Dashboard_Admin", "Home")">Dashboard</a></li>
+        <li><a href="@Url.Action("claims_A", "Home")">Manage Claims</a></li>
+        <li><a href="@Url.Action("Profile_A", "Home")">Profile</a></li>
+    </ul>
+</nav>
+
+<!-- Profile Section -->
+<div class="profile-container">
+    <h1>Admin Profile</h1>
+    <div class="profile-card">
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Picture" class="profile-img" />
+        <div class="profile-info">
+            <h2><p><strong>Email:</strong> @Model.Email</p></h2>
+            <p><strong>Position:</strong> @Model.Role</p>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h2>Admin Profile</h2>
+    <div class="row">
+		<div class="col-md-10">
+            <p>Email: @Model.Email</p>
+            <p>Position: @Model.Role</p>
+            <p>Responsibilities: Manage claims, users, and system settings.</p>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Quick Actions</h3>
+            <ul>
+                <li><a href="@Url.Action("claims_A", "Home")">Manage Claims</a></li>
+                <li><a href="@Url.Action("Dashboard_Admin", "Home")">View Dashboard</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>System Info</h3>
+            <p>System Version: 1.0.0</p>
+            <p>Last Updated: October 2025</p>
+        </div>
+    </div>
+</div>

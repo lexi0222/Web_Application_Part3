@@ -1,0 +1,38 @@
+﻿@model Web_Application_Part3.Models.register
+
+
+<link rel="stylesheet" href="~/css/log_regi.css" />
+<div class="container">
+    <div class="left-section">
+        <h2>CMSC</h2>
+    </div>
+    <div class="right-section">
+        <h1>Create Account</h1>
+        <form asp-action="Register" method="post" enctype="multipart/form-data">
+            <label type="text" asp-for="FullName" class="form-label">FullName</label>
+            <input asp-for="FullName" type="text" placeholder="Enter your full name" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+
+            <label type="text" asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" type="email" placeholder="Enter your email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+
+            <label type="text" asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" type="password" placeholder="Enter password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+
+
+            <select asp-for="Role">
+                <option>-- Select Role --</option>
+                <option value="Admin" action="/Home/Dashboard_Admin">Admin</option>
+                <option value="HR" action="/Home/Dashboard_HR">HR</option>
+                <option value="Lecturer" action="/Home/Dashboard_L">Lecturer</option>
+               
+            </select>
+            <span asp-validation-for="Role" class="text-danger"></span>
+
+            <button type="submit">Register</button>
+            <p>Already have an account?   <a asp-action="Index" asp-controller="Home">Login</a></p>
+        </form>
+    </div>
+</div>

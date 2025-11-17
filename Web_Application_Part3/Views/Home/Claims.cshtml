@@ -1,0 +1,84 @@
+﻿@model Web_Application_Part3.Models.claims
+
+
+<link rel="stylesheet" href="~/css/nav.css" />
+<link rel="stylesheet" href="~/css/claim.css" />
+
+<nav>
+    <ul>
+        <li><a href="@Url.Action("Dashboard_L", "Home")">Dashboard</a></li>
+        <li><a href="@Url.Action("Claims", "Home")">Submit Claim</a></li>
+        <li><a href="@Url.Action("Profile_L", "Home")">Profile</a></li>
+    </ul>
+</nav>
+
+<h2>Submit a Claim</h2>
+
+<form asp-action="Claims" method="post" enctype="multipart/form-data">
+    <label for="FacallyName">Faculty Name</label>
+    <input type="text" id="FacallyName" name="FacallyName" required />
+
+    <label for="ModuleName">Module</label>
+    <input type="text" id="ModuleName" name="ModuleName" required />
+
+    <label for="Hourworked">Hours Worked</label>
+    <input type="number" id="Hourworked" name="Hourworked" required />
+
+    <label for="Hourlyrate">Hourly Rate</label>
+    <input type="number" id="Hourlyrate" name="Hourlyrate" required />
+
+    <label for="TotalAmount">Total Amount</label>
+    <input type="number" id="TotalAmount" name="TotalAmount" required />
+
+
+    <label>Supporting Documents</label>
+    <input type="file" name="SupportingDocuments" />
+
+    <input type="submit" value="Submit Claim" />
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert">@ViewBag.Message</div>
+}
+
+<h2>Your Claims History</h2>
+<table>
+    <tr>
+        <th>Faculty</th>
+        <th>Module</th>
+        <th>Hours</th>
+        <th>Rate</th>
+        <th>Total</th>
+        <th>Documents</th>
+        <th>Date</th>
+        <th>Status</th>
+    </tr>
+    @if (ViewBag.ClaimsHistory != null)
+    {
+        foreach (var claim in ViewBag.ClaimsHistory)
+        {
+            <tr>
+                <td>@claim.FacallyName</td>
+                <td>@claim.ModuleName</td>
+                <td>@claim.Hourworked</td>
+                <td>@claim.Hourlyrate</td>
+                <td>@claim.TotalAmount</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(claim.SupportingDocuments))
+                    {
+                        <a href="~/@claim.SupportingDocuments" target="_blank">View</a>
+                    }
+                    else
+                    {
+                        <span>None</span>
+                    }
+                </td>
+
+                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                <td>@claim.claim_status</td>
+            </tr>
+        }
+    }
+</table>
+
