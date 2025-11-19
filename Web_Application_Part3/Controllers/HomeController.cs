@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
@@ -494,21 +494,64 @@ namespace Web_Application_Part3.Controllers
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                var query = "UPDATE Claims SET claim_status = @claim_status WHERE claimID = @claimID";
-                var command = new SqlCommand(query, connection);
-                command.Parameters.Add("@claimID", SqlDbType.Int).Value = claimID;
-                command.Parameters.Add("@claim_status", SqlDbType.NVarChar).Value = claim_status;
-                try
+
+                // 1️⃣ Get lecturer email from the claim
+                string lecturerEmail = "";
+                string getEmailQuery = @"
+            SELECT u.Email
+            FROM Claims c
+            JOIN Users u ON c.userID = u.userID
+            WHERE c.claimID = @claimID";
+
+                using (var command = new SqlCommand(getEmailQuery, connection))
                 {
-                    command.ExecuteNonQuery();
+                    command.Parameters.AddWithValue("@claimID", claimID);
+                    lecturerEmail = command.ExecuteScalar()?.ToString();
                 }
-                catch (SqlException ex)
+
+                // 2️⃣ Update claim status as selected by Admin
+                string updateQuery = "UPDATE Claims SET claim_status = @claim_status WHERE claimID = @claimID";
+                using (var cmd = new SqlCommand(updateQuery, connection))
                 {
-                    ModelState.AddModelError("", ex.Message);
+                    cmd.Parameters.AddWithValue("@claimID", claimID);
+                    cmd.Parameters.AddWithValue("@claim_status", claim_status);
+                    cmd.ExecuteNonQuery();
+                }
+
+                // 3 ADMIN NOTIFICATIONS (Lecturer ONLY)
+                if (!string.IsNullOrEmpty(lecturerEmail))
+                {
+                    if (claim_status == "Approved")
+                    {
+                        AddNotification(
+                            lecturerEmail,
+                            $"Your claim #{claimID} has been approved by Admin.",
+                            "AdminApproved"
+                        );
+
+                        // Set status to move to HR queue
+                        string hrStatusQuery = "UPDATE Claims SET claim_status = 'PendingHR' WHERE claimID = @claimID";
+                        using (var cmd = new SqlCommand(hrStatusQuery, connection))
+                        {
+                            cmd.Parameters.AddWithValue("@claimID", claimID);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    else if (claim_status == "Declined")
+                    {
+                        AddNotification(
+                            lecturerEmail,
+                            $"Your claim #{claimID} has been declined by Admin.",
+                            "AdminDeclined"
+                        );
+                    }
                 }
             }
+
             return RedirectToAction("claims_A");
         }
+
+
 
         public IActionResult ClaimsHistory()
         {
