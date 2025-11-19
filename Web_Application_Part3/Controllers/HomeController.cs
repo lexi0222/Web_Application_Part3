@@ -742,6 +742,23 @@ namespace Web_Application_Part3.Controllers
             return list;
         }
 
+        private void AddNotification(string userEmail, string message, string type)
+        {
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"INSERT INTO Notifications (UserEmail, Message, Type)
+                         VALUES (@UserEmail, @Message, @Type)";
+                using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@UserEmail", userEmail);
+                    cmd.Parameters.AddWithValue("@Message", message);
+                    cmd.Parameters.AddWithValue("@Type", type);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
 
     }
 }
