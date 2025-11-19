@@ -69,6 +69,7 @@ namespace Web_Application_Part3.Controllers
             return View(user);
         }
 
+
         public IActionResult Privacy()
         {
             return View();
@@ -124,6 +125,7 @@ namespace Web_Application_Part3.Controllers
         }
 
         
+        [HttpPost]
         [HttpPost]
         public IActionResult Claims(claims info)
         {
