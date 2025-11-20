@@ -1,7 +1,9 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Web_Application_Part3.Models;
 using static Web_Application_Part3.Models.DashboardModel;
@@ -199,22 +201,24 @@ namespace Web_Application_Part3.Controllers
 
         public IActionResult Dashboard_L()
         {
+           
             var email = HttpContext.Session.GetString("Email");
-            var role = HttpContext.Session.GetString("Role");
 
-            if (string.IsNullOrEmpty(email) || role != "Lecturer")
-            {
-                return RedirectToAction("Index");
-            }
 
-            var claims = GetLecturerClaims(email);
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("Index");
+
+
             var model = new LecturerDashboardModel
             {
-                RecentClaims = claims
+                LecturerName = HttpContext.Session.GetString("Name"),
+                Notifications = GetLecturerNotifications(email),
+                MyClaims = GetLecturerClaims(email),
+                RecentClaims = GetLecturerClaims(email)
             };
 
             return View(model);
         }
+
 
         private List<Claim> GetLecturerClaims(string email)
         {
@@ -244,12 +248,40 @@ namespace Web_Application_Part3.Controllers
             return claims;
         }
 
+
         private List<Notification> GetLecturerNotifications(string email)
         {
             var notifications = new List<Notification>();
-            // add notifications to the list
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"SELECT * FROM Notifications WHERE UserEmail = @Email";
+                using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            notifications.Add(new Notification
+                            {
+                                NotificationID = Convert.ToInt32(reader["NotificationID"]),
+                                Message = reader["Message"].ToString(),
+                                Type = reader["Type"].ToString(),
+                                CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
+                                IsRead = Convert.ToBoolean(reader["IsRead"]),
+                                UserEmail = reader["UserEmail"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
             return notifications;
         }
+
+
+
+
 
         private List<Claim> GetLecturerRecentClaims(string email)
         {
@@ -481,72 +513,51 @@ namespace Web_Application_Part3.Controllers
 
 
         [HttpPost]
-        public IActionResult UpdateClaimStatus(int claimID, string claim_status)
+        public IActionResult UpdateClaimStatus_Admin(int claimID, string claim_status)
         {
-            if (string.IsNullOrEmpty(claim_status))
+            string lecturerEmail = GetLecturerEmailByClaimID(claimID);
+            using (var con = new SqlConnection(connectionString))
             {
-                ModelState.AddModelError("claim_status", "Status is required");
-                return RedirectToAction("claims_A");
-            }
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-
-                // 1️⃣ Get lecturer email from the claim
-                string lecturerEmail = "";
-                string getEmailQuery = @"
-            SELECT u.Email
-            FROM Claims c
-            JOIN Users u ON c.userID = u.userID
-            WHERE c.claimID = @claimID";
-
-                using (var command = new SqlCommand(getEmailQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@claimID", claimID);
-                    lecturerEmail = command.ExecuteScalar()?.ToString();
-                }
-
-                // 2️⃣ Update claim status as selected by Admin
-                string updateQuery = "UPDATE Claims SET claim_status = @claim_status WHERE claimID = @claimID";
-                using (var cmd = new SqlCommand(updateQuery, connection))
+                con.Open();
+                string query = "UPDATE Claims SET claim_status = @claim_status WHERE claimID = @claimID";
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@claimID", claimID);
                     cmd.Parameters.AddWithValue("@claim_status", claim_status);
                     cmd.ExecuteNonQuery();
                 }
-
-                // 3 ADMIN NOTIFICATIONS (Lecturer ONLY)
-                if (!string.IsNullOrEmpty(lecturerEmail))
-                {
-                    if (claim_status == "Approved")
-                    {
-                        AddNotification(
-                            lecturerEmail,
-                            $"Your claim #{claimID} has been approved by Admin.",
-                            "AdminApproved"
-                        );
-
-                        // Set status to move to HR queue
-                        string hrStatusQuery = "UPDATE Claims SET claim_status = 'PendingHR' WHERE claimID = @claimID";
-                        using (var cmd = new SqlCommand(hrStatusQuery, connection))
-                        {
-                            cmd.Parameters.AddWithValue("@claimID", claimID);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                    else if (claim_status == "Declined")
-                    {
-                        AddNotification(
-                            lecturerEmail,
-                            $"Your claim #{claimID} has been declined by Admin.",
-                            "AdminDeclined"
-                        );
-                    }
-                }
             }
+            // AUTOMATIC NOTIFICATION
+            if (claim_status == "ApprovedByAdmin")
+            {
+                AddNotification(lecturerEmail, "SUCCESS", "Your claim has been approved by the Coordinator.");
+            }
+            else if (claim_status == "DeclinedByAdmin")
+            {
+                AddNotification(lecturerEmail, "WARNING", "Your claim has been declined by the Coordinator.");
+            }
+            return RedirectToAction("Dashboard_Admin");
+        }
 
-            return RedirectToAction("claims_A");
+
+
+        private string GetLecturerEmailByClaimID(int claimID)
+        {
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"SELECT u.Email 
+                         FROM Claims c
+                         JOIN Users u ON c.userID = u.userID
+                         WHERE c.claimID = @claimID";
+
+                using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@claimID", claimID);
+                    return cmd.ExecuteScalar()?.ToString();
+                }
+
+            }
         }
 
 
@@ -788,13 +799,15 @@ namespace Web_Application_Part3.Controllers
             using (var con = new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"INSERT INTO Notifications (UserEmail, Message, Type)
-                         VALUES (@UserEmail, @Message, @Type)";
+                string query = @"INSERT INTO Notifications (UserEmail, Message, Type, CreatedAt, IsRead) 
+                         VALUES (@UserEmail, @Message, @Type, @CreatedAt, @IsRead)";
                 using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@UserEmail", userEmail);
                     cmd.Parameters.AddWithValue("@Message", message);
                     cmd.Parameters.AddWithValue("@Type", type);
+                    cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@IsRead", false);
                     cmd.ExecuteNonQuery();
                 }
             }

@@ -3,16 +3,18 @@
     public class DashboardModel
     {
 
-        public class LecturerDashboardModel
-        {
-            public List<Notification> Notifications { get; set; }
-            public List<Claim> RecentClaims { get; set; }
-            public List<Claim> ApprovedClaims { get; set; }
-            public List<Claim> DeclinedClaims { get; set; }
-        }
-
-
+     
     }
+    public class LecturerDashboardModel
+    {
+        public List<Notification> Notifications { get; set; }
+        public List<Claim> RecentClaims { get; set; }
+        public List<Claim> ApprovedClaims { get; set; }
+        public List<Claim> DeclinedClaims { get; set; }
+        public List<Claim> MyClaims { get; set; }
+        public string LecturerName { get; set; }
+    }
+
 
     public class Notification
     {
@@ -23,6 +25,7 @@
         public bool IsRead { get; set; }
         public string UserEmail { get; set; }
     }
+
 
     public class RecentUpdate
     {

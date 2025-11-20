@@ -64,7 +64,7 @@
                         <td>@claim.ModuleName</td>
                         <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
                         <td>
-                            <form asp-action="UpdateClaimStatus" method="post">
+                            <form asp-action="UpdateClaimStatus_Admin" method="post">
                                 <input type="hidden" name="claimID" value="@claim.claimID" />
                                 <select name="claim_status" onchange="this.form.submit()">
                                     @if (claim.claim_status == "Pending")
