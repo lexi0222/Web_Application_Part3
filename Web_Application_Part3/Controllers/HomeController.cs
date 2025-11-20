@@ -246,8 +246,6 @@ namespace Web_Application_Part3.Controllers
 
         private List<Notification> GetLecturerNotifications(string email)
         {
-            // populate notifications data here
-            // for example:
             var notifications = new List<Notification>();
             // add notifications to the list
             return notifications;
