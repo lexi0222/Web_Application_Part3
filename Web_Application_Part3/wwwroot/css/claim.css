@@ -1,89 +1,55 @@
-﻿/* Form */
-form {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 500px;
-    margin-bottom: 30px;
+﻿/* Page wrapper */
+.page-wrapper {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 10px;
+    text-align: center;
 }
 
-label {
-    display: block;
-    margin-top: 10px;
+/* Title */
+.title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #1e3a8a;
     font-weight: bold;
 }
 
-input[type="text"],
-input[type="number"] {
+/* Form improved */
+.claim-form {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+    /* Inputs spacing */
+    .claim-form input[type="text"],
+    .claim-form input[type="number"],
+    .claim-form input[type="file"] {
+        margin-top: 5px;
+        margin-bottom: 12px;
+    }
+
+/* Submit button */
+.submit-btn {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-
-input[type="submit"] {
-    margin-top: 15px;
+    font-size: 16px;
+    padding: 12px;
     background: #1e3a8a;
-    color: white;
-    padding: 10px 15px;
-    border: none;
     border-radius: 6px;
-    cursor: pointer;
 }
 
-    input[type="submit"]:hover {
+    .submit-btn:hover {
         background: #2563eb;
     }
 
-/* Table */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+/* Alert message */
+.alert-message {
+    margin-top: 25px;
+    padding: 15px;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
 }
-
-th, td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-th {
-    background: #f1f5f9;
-}
-
-tr:hover {
-    background: #f9fafb;
-}
-
-/* Status colors */
-.approved {
-    color: #155724;
-    font-weight: bold;
-    background: #d4edda;
-    text-align: center;
-}
-
-.declined {
-    color: #721c24;
-    font-weight: bold;
-    background: #f8d7da;
-    text-align: center;
-}
-
-.supporting-docs {
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.supporting-docs-input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-    .supporting-docs-input:hover {
-        border-color: #aaa;
-    }

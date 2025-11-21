@@ -40,48 +40,17 @@
 
 @if (ViewBag.Message != null)
 {
-    <div class="alert">@ViewBag.Message</div>
+    <h2>
+        <div class="alert">@ViewBag.Message</div>
+        
+    </h2>
+  
 }
 
-<h2>Your Claims History</h2>
-<table>
-    <tr>
-        <th>Faculty</th>
-        <th>Module</th>
-        <th>Hours</th>
-        <th>Rate</th>
-        <th>Total</th>
-        <th>Documents</th>
-        <th>Date</th>
-        <th>Status</th>
-    </tr>
-    @if (ViewBag.ClaimsHistory != null)
-    {
-        foreach (var claim in ViewBag.ClaimsHistory)
-        {
-            <tr>
-                <td>@claim.FacallyName</td>
-                <td>@claim.ModuleName</td>
-                <td>@claim.Hourworked</td>
-                <td>@claim.Hourlyrate</td>
-                <td>@claim.TotalAmount</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(claim.SupportingDocuments))
-                    {
-                        <a href="~/@claim.SupportingDocuments" target="_blank">View</a>
-                    }
-                    else
-                    {
-                        <span>None</span>
-                    }
-                </td>
 
-                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
-                <td>@claim.claim_status</td>
-            </tr>
-        }
-    }
-</table>
+
+
+
 
 <script>
     document.getElementById('Hourworked').addEventListener('input', calculateTotal);
