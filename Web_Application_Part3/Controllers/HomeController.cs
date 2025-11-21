@@ -725,10 +725,12 @@ namespace Web_Application_Part3.Controllers
             using (var con = new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"SELECT c.*, u.full_names AS LecturerName
-                         FROM Claims c
-                         JOIN Users u ON c.userID = u.userID
-                         WHERE claim_status = 'PendingHR'";
+                string query = @"
+            SELECT c.*, u.full_names AS LecturerName
+            FROM Claims c
+            JOIN Users u ON c.userID = u.userID
+            WHERE c.claim_status IN ('Approved', 'Declined')"; // Admin acted
+
                 using (var cmd = new SqlCommand(query, con))
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -744,7 +746,7 @@ namespace Web_Application_Part3.Controllers
                             TotalAmount = Convert.ToInt32(reader["TotalAmount"]),
                             claim_status = reader["claim_status"].ToString(),
                             creating_date = Convert.ToDateTime(reader["creating_date"]),
-                            SupportingDocuments = reader["SupportingDocuments"].ToString()
+                            
                         });
                     }
                 }
@@ -763,7 +765,7 @@ namespace Web_Application_Part3.Controllers
                 string query = @"SELECT c.*, u.full_names AS LecturerName
                          FROM Claims c
                          JOIN Users u ON c.userID = u.userID
-                         WHERE claim_status = 'ApprovedByHR'";
+                         WHERE claim_status = 'Approved'";
                 using (var cmd = new SqlCommand(query, con))
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -796,7 +798,8 @@ namespace Web_Application_Part3.Controllers
                 string query = @"SELECT c.*, u.full_names AS LecturerName
                          FROM Claims c
                          JOIN Users u ON c.userID = u.userID
-                         WHERE claim_status = 'DeclinedByHR'";
+                         WHERE claim_status = 'Declined'";
+
                 using (var cmd = new SqlCommand(query, con))
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -819,6 +822,36 @@ namespace Web_Application_Part3.Controllers
             }
             return list;
         }
+
+        [HttpPost]
+        public IActionResult UpdateHRStatus(int claimID, string claim_status)
+        {
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = "UPDATE Claims SET claim_status = @status WHERE claimID = @id";
+                using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@id", claimID);
+                    cmd.Parameters.AddWithValue("@status", claim_status);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            // Notify the lecturer
+            string lecturerEmail = GetLecturerEmailByClaimID(claimID);
+            string message = claim_status switch
+            {
+                "Approved" => "Your claim has been approved by HR.",
+                "Declined" => "Your claim has been declined by HR.",
+                "Pending" => "Your claim status has been reverted to pending by HR.",
+                _ => "Your claim status was updated by HR."
+            };
+            AddNotification(lecturerEmail, message, "HRUpdate");
+
+            return RedirectToAction("Dashboard_HR");
+        }
+
 
 
         private void AddNotification(string userEmail, string message, string type)

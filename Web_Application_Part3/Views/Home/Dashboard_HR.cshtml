@@ -56,7 +56,7 @@
                     <th>Module</th>
                     <th>Total (R)</th>
                     <th>Submitted</th>
-                    <th>Document</th>
+                   
                     <th>Action</th>
                 </tr>
             </thead>
@@ -75,9 +75,9 @@
                             <form asp-action="UpdateHRStatus" method="post">
                                 <input type="hidden" name="claimID" value="@claim.claimID" />
                                 <select name="claim_status" onchange="this.form.submit()">
-                                    <option value="HR Pending">HR Pending</option>
-                                    <option value="HR Approved">HR Approved</option>
-                                    <option value="HR Declined">HR Declined</option>
+                                    <option value="Pending">HR Pending</option>
+                                    <option value="Approved">HR Approved</option>
+                                    <option value="Declined">HR Declined</option>
                                 </select>
                             </form>
 
