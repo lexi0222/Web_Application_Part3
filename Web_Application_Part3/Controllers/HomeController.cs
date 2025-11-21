@@ -871,6 +871,44 @@ namespace Web_Application_Part3.Controllers
             }
         }
 
+        public IActionResult Profile_HR()
+        {
+            // Get the logged-in HR email from session
+            var email = HttpContext.Session.GetString("Email");
+            var role = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(email) || role != "HR")
+                return RedirectToAction("Index"); // Not logged in or not HR
+
+            Login user = null;
+
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = "SELECT Email, Role FROM Users WHERE Email = @Email";
+                using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            user = new Login
+                            {
+                                Email = reader["Email"].ToString(),
+                                Role = reader["Role"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+
+            if (user == null)
+                return RedirectToAction("Index"); // fallback if user not found
+
+            return View(user); // Pass the HR user info to the view
+        }
+
 
     }
 }

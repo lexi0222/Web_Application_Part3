@@ -1,45 +1,114 @@
-﻿.dashboard-container {
-    max-width: 800px;
+﻿/* Dashboard Container */
+.dashboard-container {
+    max-width: 1200px;
     margin: 40px auto;
-    padding: 20px;
-    background-color: #333333;
-    border: 1px solid #444444;
+    padding: 30px;
+    background-color: #1e1e2f;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+    /* Headings */
+    .dashboard-container h1,
+    .dashboard-container h2 {
+        color: #ffffff;
+        margin-bottom: 15px;
+    }
+
+/* Notifications */
+.notifications {
+    background-color: #2a2a3f;
+    padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    color: #FFFFFF; /* Added white text color */
+    margin-bottom: 30px;
+}
+
+    .notifications ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .notifications li {
+        padding: 8px 0;
+        border-bottom: 1px solid #444;
+    }
+
+        .notifications li:last-child {
+            border-bottom: none;
+        }
+
+/* Notification badges */
+.new-claim-notification {
+    color: #f1c40f;
+    font-weight: bold;
+    margin-right: 8px;
 }
 
 .approved-notification {
     color: #2ecc71;
     font-weight: bold;
+    margin-right: 8px;
 }
 
-.rejected-notification {
+.declined-notification {
     color: #e74c3c;
     font-weight: bold;
+    margin-right: 8px;
 }
 
-.pending-notification {
-    color: #f1c40f;
-    font-weight: bold;
+/* Tables */
+.dashboard-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #2a2a3f;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.recent-updates ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    .dashboard-container table th,
+    .dashboard-container table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #444;
+    }
+
+    .dashboard-container table th {
+        background-color: #3a3a50;
+        font-weight: bold;
+    }
+
+    .dashboard-container table tr:hover {
+        background-color: #3e3e60;
+    }
+
+    .dashboard-container table td form select {
+        padding: 5px 8px;
+        border-radius: 5px;
+        border: none;
+        background-color: #444466;
+        color: #fff;
+    }
+
+/* Sections */
+.pending-claims,
+.approved-claims,
+.declined-claims {
+    margin-bottom: 40px;
 }
 
-.recent-updates li {
-    margin-bottom: 10px;
-}
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .dashboard-container {
+        padding: 20px;
+        margin: 20px;
+    }
 
-.update-date {
-    font-size: 12px;
-    color: #FFFFFF; /* Changed to white */
-}
-
-.update-message {
-    font-size: 14px;
-    color: #FFFFFF; /* Changed to white */
+        .dashboard-container table th,
+        .dashboard-container table td {
+            padding: 8px 10px;
+        }
 }

@@ -1,4 +1,5 @@
-﻿@model Web_Application_Part3.Models.HRDashboardModel
+﻿
+@model Web_Application_Part3.Models.HRDashboardModel
 
 <link rel="stylesheet" href="~/css/nav.css" />
 <link rel="stylesheet" href="~/css/claim.css" />
@@ -7,7 +8,7 @@
 <nav>
     <ul class="nav-menu">
         <li><a href="@Url.Action("Dashboard_HR", "Home")">Dashboard</a></li>
-        <li><a href="@Url.Action("ManageLecturersAndAdmins", "Home")">Manage Lecturers and Admins</a></li>
+
         <li><a href="@Url.Action("Profile_HR", "Home")">Profile</a></li>
     </ul>
 </nav>
@@ -20,29 +21,52 @@
     <h1>Welcome HR — @Model.HRName</h1>
 
     <!-- Notifications -->
+    <!-- Notifications -->
     <div class="notifications">
         <h2>Notifications</h2>
-        <ul>
-            @foreach (var notification in Model.Notifications)
-            {
-                <li>
-                    @if (notification.Type == "NewClaim")
+        @if (Model.Notifications != null && Model.Notifications.Count > 0)
+        {
+            <table class="notifications-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var notification in Model.Notifications)
                     {
-                        <span class="new-claim-notification">NEW CLAIM</span>
+                        <tr>
+                            <td>
+                                @if (notification.Type == "NewClaim")
+                                {
+                                    <span class="new-claim-notification">New Claim</span>
+                                }
+                                else if (notification.Type == "AdminApproved")
+                                {
+                                    <span class="approved-notification">Admin Approved</span>
+                                }
+                                else if (notification.Type == "Warning")
+                                {
+                                    <span class="declined-notification">Warning</span>
+                                }
+                                else
+                                {
+                                    <span class="info-notification">@notification.Type</span>
+                                }
+                            </td>
+                            <td>@notification.Message</td>
+                            <td>@notification.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
                     }
-                    else if (notification.Type == "AdminApproved")
-                    {
-                        <span class="approved-notification">ADMIN APPROVED</span>
-                    }
-                    else if (notification.Type == "Warning")
-                    {
-                        <span class="declined-notification">WARNING</span>
-                    }
-
-                    @notification.Message
-                </li>
-            }
-        </ul>
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No notifications available.</p>
+        }
     </div>
 
     <!-- Pending HR Claims -->
@@ -51,7 +75,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Claim ID</th>
+                   
                     <th>Faculty</th>
                     <th>Module</th>
                     <th>Total (R)</th>
@@ -64,7 +88,7 @@
                 @foreach (var claim in Model.PendingHRClaims)
                 {
                     <tr>
-                        <td>@claim.claimID</td>
+                       
                         <td>@claim.FacallyName</td>
                         <td>@claim.ModuleName</td>
                         <td>@claim.TotalAmount</td>
@@ -104,7 +128,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Claim ID</th>
+                   
                     <th>Faculty</th>
                     <th>Module</th>
                     <th>Total (R)</th>
@@ -115,7 +139,7 @@
                 @foreach (var claim in Model.ApprovedByHR)
                 {
                     <tr>
-                        <td>@claim.claimID</td>
+                        
                         <td>@claim.FacallyName</td>
                         <td>@claim.ModuleName</td>
                         <td>@claim.TotalAmount</td>
@@ -132,7 +156,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Claim ID</th>
+                  
                     <th>Faculty</th>
                     <th>Module</th>
                     <th>Total (R)</th>
@@ -143,7 +167,7 @@
                 @foreach (var claim in Model.DeclinedByHR)
                 {
                     <tr>
-                        <td>@claim.claimID</td>
+                       
                         <td>@claim.FacallyName</td>
                         <td>@claim.ModuleName</td>
                         <td>@claim.TotalAmount</td>
