@@ -28,16 +28,17 @@
                     @foreach (var notification in Model.Notifications)
                     {
                         <li>
-                            @if (notification.Type == "SUCCESS")
+                            @if (notification.Type == "Approved")
           
                             {
                                 <span class="approved-notification">APPROVED</span>
                             }
-                            else if (notification.Type == "WARNING")
+                            else if (notification.Type == "Declined")
                             {
                                 <span class="declined-notification">DECLINED</span>
                             }
-                            @notification.Message
+                            @notification.Message - @notification.CreatedDate.ToString("dd/MM/yyyy")
+
                         </li>
                     }
                 </ul>
@@ -55,10 +56,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Claim ID</th>
+                           
                             <th>Faculty Name</th>
                             <th>Module Name</th>
-                            <th>Status</th>
+                          
                             <th>Created Date</th>
                         </tr>
                     </thead>
@@ -66,10 +67,10 @@
                         @foreach (var claim in Model.RecentClaims)
                         {
                             <tr>
-                                <td>@claim.claimID</td>
+                              
                                 <td>@claim.FacallyName</td>
                                 <td>@claim.ModuleName</td>
-                                <td>Pending</td>
+                           
                                 <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
                             </tr>
                         }
@@ -81,38 +82,32 @@
         {
             <p>No recent claims available.</p>
         }
-        <!-- Approved Claims -->
-        @if (Model.ApprovedClaims != null)
-        {
-            <div class="approved-claims">
-                <h2>Approved Claims</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Claim ID</th>
-                            <th>Faculty Name</th>
-                            <th>Module Name</th>
-                            <th>Created Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var claim in Model.ApprovedClaims)
-                        {
-                            <tr>
-                                <td>@claim.claimID</td>
-                                <td>@claim.FacallyName</td>
-                                <td>@claim.ModuleName</td>
-                                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <p>No approved claims available.</p>
-        }
+
+        <h2>Approved and Declined claims</h2>
+        <table>
+            <thead>
+                <tr>
+                   
+                    <th>Faculty Name</th>
+                    <th>Module Name</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.RecentClaims)
+                {
+                    <tr>
+                       
+                        <td>@claim.FacallyName</td>
+                        <td>@claim.ModuleName</td>
+                        <td>@claim.claim_status</td>
+                        <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+       
         <!-- Declined Claims -->
         @if (Model.DeclinedClaims != null)
         {
@@ -143,7 +138,7 @@
         }
         else
         {
-            <p>No declined claims available.</p>
+            <p></p>
         }
     </div>
 }
@@ -151,26 +146,3 @@ else
 {
     <p>No data available.</p>
 }
-<table>
-    <thead>
-        <tr>
-            <th>Claim ID</th>
-            <th>Faculty Name</th>
-            <th>Module Name</th>
-            <th>Status</th>
-            <th>Created Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var claim in Model.RecentClaims)
-        {
-            <tr>
-                <td>@claim.claimID</td>
-                <td>@claim.FacallyName</td>
-                <td>@claim.ModuleName</td>
-                <td>@claim.claim_status</td>
-                <td>@claim.creating_date.ToString("dd/MM/yyyy")</td>
-            </tr>
-        }
-    </tbody>
-</table>

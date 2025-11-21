@@ -207,11 +207,12 @@ namespace Web_Application_Part3.Controllers
 
             if (string.IsNullOrEmpty(email)) return RedirectToAction("Index");
 
+            var notifications = GetNotifications(email);
 
             var model = new LecturerDashboardModel
             {
                 LecturerName = HttpContext.Session.GetString("Name"),
-                Notifications = GetLecturerNotifications(email),
+                Notifications = notifications,
                 MyClaims = GetLecturerClaims(email),
                 RecentClaims = GetLecturerClaims(email)
             };
@@ -255,7 +256,7 @@ namespace Web_Application_Part3.Controllers
             using (var con = new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"SELECT * FROM Notifications WHERE UserEmail = @Email";
+                string query = @"SELECT UserEmail,Message,Type, CreatedDate  FROM Notifications WHERE UserEmail = @Email";
                 using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Email", email);
@@ -265,12 +266,11 @@ namespace Web_Application_Part3.Controllers
                         {
                             notifications.Add(new Notification
                             {
-                                NotificationID = Convert.ToInt32(reader["NotificationID"]),
+                                
                                 Message = reader["Message"].ToString(),
                                 Type = reader["Type"].ToString(),
-                                CreatedAt = Convert.ToDateTime(reader["CreatedAt"]),
-                                IsRead = Convert.ToBoolean(reader["IsRead"]),
-                                UserEmail = reader["UserEmail"].ToString()
+                                CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
+                             
                             });
                         }
                     }
@@ -528,13 +528,13 @@ namespace Web_Application_Part3.Controllers
                 }
             }
             // AUTOMATIC NOTIFICATION
-            if (claim_status == "ApprovedByAdmin")
+            if (claim_status == "Approved")
             {
-                AddNotification(lecturerEmail, "SUCCESS", "Your claim has been approved by the Coordinator.");
+                AddNotification(lecturerEmail, "Approved", "Your claim has been approved by the Coordinator/Admin/HR.");
             }
-            else if (claim_status == "DeclinedByAdmin")
+            else if (claim_status == "Declined")
             {
-                AddNotification(lecturerEmail, "WARNING", "Your claim has been declined by the Coordinator.");
+                AddNotification(lecturerEmail, "Declined", "Your claim has been declined by the Coordinator/Admin/HR.");
             }
             return RedirectToAction("Dashboard_Admin");
         }
@@ -610,9 +610,34 @@ namespace Web_Application_Part3.Controllers
 
         private List<Notification> GetNotifications(string email)
         {
-            // implement this method to retrieve notifications from the database
-            return new List<Notification>();
+            var notifications = new List<Notification>();
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                string query = @"SELECT Message, Type, CreatedDate FROM Notifications WHERE UserEmail = @Email";
+                using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            notifications.Add(new Notification
+                            {
+                                Message = reader["Message"].ToString(),
+                                Type = reader["Type"].ToString(),
+                                CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
+                            });
+                        }
+                    }
+                }
+            }
+            return notifications;
         }
+
+
+
+
 
         private List<RecentUpdate> GetRecentUpdates(string email)
         {
@@ -794,20 +819,19 @@ namespace Web_Application_Part3.Controllers
             return list;
         }
 
+
         private void AddNotification(string userEmail, string message, string type)
         {
             using (var con = new SqlConnection(connectionString))
             {
                 con.Open();
-                string query = @"INSERT INTO Notifications (UserEmail, Message, Type, CreatedAt, IsRead) 
-                         VALUES (@UserEmail, @Message, @Type, @CreatedAt, @IsRead)";
+                string query = @"INSERT INTO Notifications (UserEmail, Message, Type, CreatedDate) VALUES (@UserEmail, @Message, @Type, @CreatedDate)";
                 using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@UserEmail", userEmail);
                     cmd.Parameters.AddWithValue("@Message", message);
                     cmd.Parameters.AddWithValue("@Type", type);
-                    cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@IsRead", false);
+                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
                     cmd.ExecuteNonQuery();
                 }
             }
