@@ -80,6 +80,17 @@
                                     <option value="HR Declined">HR Declined</option>
                                 </select>
                             </form>
+
+                        <td>
+                            @* Display who approved/declined the claim *@
+                            @foreach (var note in claim.Notifications)
+                            {
+                                if (note.Message.Contains("Approved by") || note.Message.Contains("Declined by"))
+                                {
+                                    <div>@note.Message</div>
+                                }
+                            }
+                        </td>
                         </td>
                     </tr>
                 }

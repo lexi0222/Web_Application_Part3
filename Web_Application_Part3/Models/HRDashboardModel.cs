@@ -28,5 +28,7 @@
         public string SupportingDocuments { get; set; }
         public string claim_status { get; set; }
         public DateTime creating_date { get; set; }
+
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

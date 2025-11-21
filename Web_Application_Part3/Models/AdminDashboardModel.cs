@@ -8,6 +8,7 @@
         public List<Claim> ApprovedClaims { get; set; }
         public List<Claim> DeclinedClaims { get; set; }
         public List<Claim> Claims { get; set; }
+      
 
     }
 }

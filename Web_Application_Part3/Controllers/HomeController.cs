@@ -515,6 +515,7 @@ namespace Web_Application_Part3.Controllers
         [HttpPost]
         public IActionResult UpdateClaimStatus_Admin(int claimID, string claim_status)
         {
+
             string lecturerEmail = GetLecturerEmailByClaimID(claimID);
             using (var con = new SqlConnection(connectionString))
             {
