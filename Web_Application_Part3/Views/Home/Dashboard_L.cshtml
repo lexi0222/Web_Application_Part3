@@ -21,21 +21,19 @@
         <!-- Notifications -->
         @if (Model.Notifications != null)
         {
+            <!-- Notifications -->
             <div class="notifications">
                 <h2>Notifications</h2>
                 <ul>
                     @foreach (var notification in Model.Notifications)
                     {
                         <li>
-                            @if (notification.Type == "NewClaim")
-                            {
-                                <span class="new-claim-notification">NEW CLAIM</span>
-                            }
-                            else if (notification.Type == "Approved")
+                            @if (notification.Type == "SUCCESS")
+          
                             {
                                 <span class="approved-notification">APPROVED</span>
                             }
-                            else if (notification.Type == "Declined")
+                            else if (notification.Type == "WARNING")
                             {
                                 <span class="declined-notification">DECLINED</span>
                             }
